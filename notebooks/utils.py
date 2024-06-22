@@ -1,8 +1,10 @@
-__all__ = ['logs', 'DEBUG', 'INFO', 'WARN', 'logging']
+__all__ = ['logs', 'DEBUG', 'INFO', 'WARN', 'logging', 'rollback']
 
-from contextlib import contextmanager
 import logging
 import sys
+from contextlib import contextmanager
+
+from sqlalchemy import Connection
 
 WARN = logging.WARN
 INFO = logging.INFO
@@ -24,3 +26,11 @@ def logs(level=logging.INFO):
         yield
     finally:
         handler.setLevel(state)
+
+
+@contextmanager
+def rollback(con: Connection):
+    """Creates a transaction that which revers changes upon completion."""
+    with con.begin() as transaction:
+        yield
+        transaction.rollback()

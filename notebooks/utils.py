@@ -4,7 +4,7 @@ import logging
 import sys
 from contextlib import contextmanager
 
-from sqlalchemy import Connection
+from sqlalchemy import Connection, text
 
 WARN = logging.WARN
 INFO = logging.INFO
@@ -34,3 +34,11 @@ def rollback(con: Connection):
     with con.begin() as transaction:
         yield
         transaction.rollback()
+
+
+def try_fix_quirks(con: Connection):
+    """Tries to fix any database specific quirks for testing."""
+    if con.dialect.name == 'sqlite':
+        # Enable enforcement of foreign keys (when using sqlite).
+        with con.begin():
+            con.execute(text('pragma foreign_keys=ON'))

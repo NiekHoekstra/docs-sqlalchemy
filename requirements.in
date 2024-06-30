@@ -1,3 +1,2 @@
-sqlalchemy
+sqlalchemy<3
 notebook
-pyodbc
